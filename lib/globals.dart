@@ -13,5 +13,15 @@ List<AppItem> desktopItems = [
     name: 'Counter',
     icon: Icons.add,
     applet: 'counter',
+  ),
+  AppItem(
+    name: 'Explorer',
+    icon: Icons.folder,
+    applet: 'explorer',
+  ),
+  AppItem(
+    name: 'Video',
+    icon: Icons.video_library,
+    applet: 'video_player',
   )
 ];

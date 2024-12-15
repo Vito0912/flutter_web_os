@@ -24,6 +24,8 @@ doc/api/
 *.js.map
 
 .idea/
+filesystem/
+assets/filesystem/
 
 .flutter-plugins
 .flutter-plugins-dependencies
