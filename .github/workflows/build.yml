@@ -1,0 +1,66 @@
+name: Publish Browser
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'lib/**'
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    needs: [ update_version ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget curl xz-utils git>=2.0 bash unzip bash zip
+
+      - name: Add exception
+        run: git config --global --add safe.directory /opt/hostedtoolcache/flutter/*
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Flutter web
+        run: flutter build web --release
+
+      - name: Zip the web directory
+        run: |
+          zip -r web-release.zip build/web/
+
+      - name: Change base href for GitHub Pages
+        run: |
+          sed -i 's|<base href="/">|<base href="/flutter_web_os/">|' build/web/index.html
+
+      - name: upload page artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+      - name: Clean up
+        if: always()
+        run: |
+          sudo rm -rf build
+
+  deploy:
+    runs-on: ubuntu-web
+    if: github.ref == 'refs/heads/main'
+    needs: build-ubuntu
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
