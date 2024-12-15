@@ -52,7 +52,7 @@ jobs:
   deploy:
     runs-on: ubuntu-web
     if: github.ref == 'refs/heads/main'
-    needs: build-ubuntu
+    needs: build-web
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
